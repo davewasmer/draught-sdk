@@ -6,7 +6,7 @@ export type SdkQueryHook = ((
   options: QueryOptions<any>
 ) => unknown) & { endpoint: string };
 
-export function addInvalidationHandling(
+export default function addInvalidationHandling(
   options: MutationOptions & { invalidateQueries?: SdkQueryHook[] },
   client: QueryClient
 ) {

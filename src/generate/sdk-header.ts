@@ -18,7 +18,9 @@ import {
   UseQueryOptions,
   QueryKey,
   UseMutationOptions } from 'react-query';
-import { addInvalidationHandling } from '@draught/sdk/invalidation';
+import query from '@draught/sdk/query';
+import mutate from '@draught/sdk/mutate';
+import addInvalidationHandling from '@draught/sdk/invalidation';
 
 ${errorTypeImport}
 

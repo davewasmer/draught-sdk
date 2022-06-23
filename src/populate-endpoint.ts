@@ -13,7 +13,7 @@ const endpointParamDelimiter = /\[([\s\S]+?)\]/g;
  */
 export default function populateEndpoint(
   endpoint: string,
-  params: Record<string, string | number>
+  params: Record<string, any>
 ) {
   let omitList = [] as string[];
   let populatedEndpoint = endpoint.replace(
@@ -26,5 +26,8 @@ export default function populateEndpoint(
       return String(params[paramName]);
     }
   );
-  return [populatedEndpoint, omit(params, omitList)] as const;
+  return [
+    populatedEndpoint,
+    omit(params, omitList) as Record<string, any>,
+  ] as const;
 }

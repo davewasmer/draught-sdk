@@ -20,8 +20,15 @@ export function generateQueryHook(desc: EndpointDescriptor) {
        */
       export function use${Name}(input: InputFor<typeof ${Endpoint}>, options?: QueryOptions<typeof ${Endpoint}>) {
         let key = ['${desc.path}', input];
-        let sdk = useSdk();
-        return useQuery<ResponseFor<typeof ${Endpoint}>, ErrorPayload>(key, sdk.query as any, options).data!;
+        return useQuery<ResponseFor<typeof ${Endpoint}>, ErrorPayload>(
+          key,
+          query(
+            process.env.NODE_ENV === 'development'
+            ? require('${desc.mockPath}')
+            : null
+          ),
+          options
+        ).data!;
       }
       use${Name}.endpoint = '${desc.path}';
     `;
@@ -44,11 +51,13 @@ export function generateMutationHook(desc: EndpointDescriptor) {
        */
       export function use${Name}(options?: MutationOptions<typeof ${Endpoint}>) {
         let client = useQueryClient();
-        let sdk = useSdk();
         return useMutation<ResponseFor<typeof ${Endpoint}>, ErrorPayload, InputFor<typeof ${Endpoint}>>(
-          (input: InputFor<typeof ${Endpoint}>) => sdk.mutate('${
-    desc.path
-  }', input),
+          makeMutate<InputFor<typeof ${Endpoint}>>(
+            '${desc.path}',
+            process.env.NODE_ENV === 'development'
+            ? require('${desc.mockPath}')
+            : null
+          ),
           addInvalidationHandling(options, client)
         ).mutateAsync;
       }

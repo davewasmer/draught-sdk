@@ -13,6 +13,7 @@ export type EndpointDescriptor = NonNullable<
 >;
 
 export function extractEndpointDescription(file: string, rootdir: string) {
+  let mockPath = file.replace(/(query|mutation).ts/, '.mock.$1');
   let filepath = relative(rootdir, file).split('.').slice(0, -1).join('.');
   let path = '/api/' + filepath;
 
@@ -42,6 +43,7 @@ export function extractEndpointDescription(file: string, rootdir: string) {
     name,
     description,
     requiresAuth,
+    mockPath,
   };
 }
 

@@ -16,7 +16,9 @@
 npm install @draught/sdk
 ```
 
-In your `.draught` file, add:
+## Customization
+
+To customize the codegen, add to your `.draught` file:
 
 ```json
 // All optional, default values shown
@@ -29,52 +31,58 @@ In your `.draught` file, add:
 }
 ```
 
+## Usage
+
 To generate the hooks:
 
 ```bash
 npx generate-sdk
 ```
 
-## Usage
+To use a query hook:
 
-```ts
-import { myPackage } from 'my-package-name';
-
-myPackage('hello');
-//=> 'hello from my package'
+```tsx
+function MyApp() {
+  // Sends a GET to the endpoint whose API function is named `getBlogPost`
+  // Params are used to fill in any dynamic url segments first, then any
+  // leftover are sent as query string params, i.e. /posts/123?expanded=true
+  let blogPost = useGetBlogPost({ id: '123', expanded: true });
+}
 ```
 
-## API
+### SSR & SSG
 
-### myPackage(input, options?)
+To leverage server-side rendering and static site generation (i.e. `getServerSideProps` and `getStaticProps`), use the `prefetch` function:
 
-#### input
+```ts
+export const getServerSideProps = prefetch([
+  // You can just pass the hook directly:
+  useGetBlogPost,
 
-Type: `string`
+  // Or you can supply params:
+  [useGetBlogPost, { id: '123' }],
 
-Lorem ipsum.
+  // Params can also be a function, which will be given the ctx object:
+  [useGetBlogPost, ctx => ({ id: ctx.params.id }),
 
-#### options
+  // You can also supply a guard function which, if it returns false, will skip
+  // prefetching this hook
+  [useGetBlogPost, {}, ctx => isLoggedIn(ctx)]
+]);
+```
 
-Type: `object`
+You
 
-##### postfix
-
-Type: `string`
-Default: `rainbows`
-
-Lorem ipsum.
-
-[build-img]: https://github.com/ryansonshine/typescript-npm-package-template/actions/workflows/release.yml/badge.svg
-[build-url]: https://github.com/ryansonshine/typescript-npm-package-template/actions/workflows/release.yml
-[downloads-img]: https://img.shields.io/npm/dt/typescript-npm-package-template
-[downloads-url]: https://www.npmtrends.com/typescript-npm-package-template
-[npm-img]: https://img.shields.io/npm/v/typescript-npm-package-template
-[npm-url]: https://www.npmjs.com/package/typescript-npm-package-template
-[issues-img]: https://img.shields.io/github/issues/ryansonshine/typescript-npm-package-template
-[issues-url]: https://github.com/ryansonshine/typescript-npm-package-template/issues
-[codecov-img]: https://codecov.io/gh/ryansonshine/typescript-npm-package-template/branch/main/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/ryansonshine/typescript-npm-package-template
+[build-img]: https://github.com/davewasmer/draught-sdk/actions/workflows/release.yml/badge.svg
+[build-url]: https://github.com/davewasmer/draught-sdk/actions/workflows/release.yml
+[downloads-img]: https://img.shields.io/npm/dt/@draught/sdk
+[downloads-url]: https://www.npmtrends.com/@draught/sdk
+[npm-img]: https://img.shields.io/npm/v/@draught/sdk
+[npm-url]: https://www.npmjs.com/package/@draught/sdk
+[issues-img]: https://img.shields.io/github/issues/davewasmer/draught-sdk
+[issues-url]: https://github.com/davewasmer/draught-sdk/issues
+[codecov-img]: https://codecov.io/gh/davewasmer/draught-sdk/branch/main/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/davewasmer/draught-sdk
 [semantic-release-img]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [commitizen-img]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg

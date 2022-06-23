@@ -18,12 +18,18 @@ let queries: string[] = [];
 let mutations: string[] = [];
 
 glob.sync(`${config.dir}/**/*.query.ts`).forEach(file => {
+  if (file.endsWith('.mock.query.ts')) {
+    return;
+  }
   let descriptor = extractEndpointDescription(file, config.dir);
   if (descriptor) {
     queries.push(generateQueryHook(descriptor));
   }
 });
 glob.sync(`${config.dir}/**/*.mutation.ts`).forEach(file => {
+  if (file.endsWith('.mock.mutation.ts')) {
+    return;
+  }
   let descriptor = extractEndpointDescription(file, config.dir);
   if (descriptor) {
     mutations.push(generateMutationHook(descriptor));
