@@ -4,9 +4,7 @@ import isMocking, { mockCtx, MockEndpoint } from './mock';
 import populateEndpoint from './populate-endpoint';
 
 /** Query the API at the given endpoint, using the supplied variables */
-export default function makeQuery<Schema extends Record<string, any>>(
-  mock: MockEndpoint<Schema> | null
-): QueryFunction {
+export default function query(mock: MockEndpoint<any> | null): QueryFunction {
   return async function query({ queryKey }) {
     let endpointUrl = queryKey[0] as string;
     let params = queryKey[1] as Record<string, string | number>;

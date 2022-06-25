@@ -4,10 +4,10 @@ import isMocking, { mockCtx, MockEndpoint } from './mock';
 import populateEndpoint from './populate-endpoint';
 
 /** Query the API at the given endpoint, using the supplied variables */
-export default function makeMutate<
-  Input extends Record<string, any>,
-  Schema extends Record<string, any>
->(endpoint: string, mock: MockEndpoint<Schema> | null) {
+export default function mutate<Input extends Record<string, any>>(
+  endpoint: string,
+  mock: MockEndpoint<any> | null
+) {
   return async function mutate(params: Input) {
     let url = endpoint;
 
@@ -22,7 +22,6 @@ export default function makeMutate<
     }
 
     if (mock && isMocking()) {
-      // TODO wrap in the mocking environment
       return mock(mockCtx, url, params);
     }
 

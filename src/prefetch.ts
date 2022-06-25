@@ -9,7 +9,7 @@ import { dehydrate, QueryClient, QueryFunction } from 'react-query';
 import config from './config';
 
 /** Configuration used to specify a hook to be fetched during SSR */
-type PrefetchHookConfig = SimplePrefetchConfig | AdvancedPrefetchConfig;
+export type PrefetchHookConfig = SimplePrefetchConfig | AdvancedPrefetchConfig;
 
 /**
  * The easiest way to prefetch a hook is to just supply the hook in the prefetch

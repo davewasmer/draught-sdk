@@ -28,7 +28,7 @@ export function generateQueryHook(desc: EndpointDescriptor) {
                 ? `process.env.NODE_ENV === 'development' ? require('${desc.mockPath}') : null`
                 : 'null'
             }
-          ),
+          ) as any,
           options
         ).data!;
       }
@@ -54,14 +54,14 @@ export function generateMutationHook(desc: EndpointDescriptor) {
       export function use${Name}(options?: MutationOptions<typeof ${Endpoint}>) {
         let client = useQueryClient();
         return useMutation<ResponseFor<typeof ${Endpoint}>, ErrorPayload, InputFor<typeof ${Endpoint}>>(
-          makeMutate<InputFor<typeof ${Endpoint}>>(
+          mutate<InputFor<typeof ${Endpoint}>>(
             '${desc.path}',
             ${
               desc.mockPath
                 ? `process.env.NODE_ENV === 'development' ? require('${desc.mockPath}') : null`
                 : 'null'
             }
-          ),
+          ) as any,
           addInvalidationHandling(options, client)
         ).mutateAsync;
       }
