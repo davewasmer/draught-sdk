@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import glob from 'glob';
 import template from './sdk-header';
 import { extractEndpointDescription } from './extract';
@@ -41,6 +42,9 @@ sdk += queries.join('\n\n');
 sdk += mutations.join('\n\n');
 sdk += '\n';
 
+if (!fs.existsSync(path.dirname(config.output))) {
+  fs.mkdirSync(path.dirname(config.output), { recursive: true });
+}
 fs.writeFileSync(config.output, sdk);
 
 process.stdout.write(
