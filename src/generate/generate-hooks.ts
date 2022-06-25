@@ -6,7 +6,7 @@ export function generateQueryHook(desc: EndpointDescriptor) {
   let Name = upperFirst(desc.name);
   let Endpoint = `${Name}Query`;
   return dedent`
-      import type ${Endpoint} from 'api/queries/${desc.filepath}';
+      import type ${Endpoint} from 'api/${desc.filepath}';
       /**
        * ${desc.description ?? `GET ${desc.path}`}
        *
@@ -23,9 +23,11 @@ export function generateQueryHook(desc: EndpointDescriptor) {
         return useQuery<ResponseFor<typeof ${Endpoint}>, ErrorPayload>(
           key,
           query(
-            process.env.NODE_ENV === 'development'
-            ? require('${desc.mockPath}')
-            : null
+            ${
+              desc.mockPath
+                ? `process.env.NODE_ENV === 'development' ? require('${desc.mockPath}') : null`
+                : 'null'
+            }
           ),
           options
         ).data!;
@@ -37,7 +39,7 @@ export function generateMutationHook(desc: EndpointDescriptor) {
   let Name = upperFirst(desc.name);
   let Endpoint = `${Name}Mutation`;
   return dedent`
-      import type ${Endpoint} from 'api/mutations/${desc.filepath}';
+      import type ${Endpoint} from 'api/${desc.filepath}';
       /**
        * ${desc.description ?? `POST ${desc.path}`}
        *
@@ -54,9 +56,11 @@ export function generateMutationHook(desc: EndpointDescriptor) {
         return useMutation<ResponseFor<typeof ${Endpoint}>, ErrorPayload, InputFor<typeof ${Endpoint}>>(
           makeMutate<InputFor<typeof ${Endpoint}>>(
             '${desc.path}',
-            process.env.NODE_ENV === 'development'
-            ? require('${desc.mockPath}')
-            : null
+            ${
+              desc.mockPath
+                ? `process.env.NODE_ENV === 'development' ? require('${desc.mockPath}') : null`
+                : 'null'
+            }
           ),
           addInvalidationHandling(options, client)
         ).mutateAsync;

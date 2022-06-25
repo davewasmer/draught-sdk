@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { relative } from 'path';
+import { dirname, join, relative } from 'path';
 import * as parser from '@babel/parser';
 import {
   File,
@@ -7,13 +7,20 @@ import {
   ExportDefaultDeclaration,
   ExportNamedDeclaration,
 } from '@babel/types';
+import config from '../config';
 
 export type EndpointDescriptor = NonNullable<
   ReturnType<typeof extractEndpointDescription>
 >;
 
 export function extractEndpointDescription(file: string, rootdir: string) {
-  let mockPath = file.replace(/(query|mutation).ts/, '.mock.$1');
+  let mockPath: string | boolean = join(
+    process.cwd(),
+    file.replace(/(query|mutation).ts/, 'mock.$1.ts')
+  );
+  mockPath =
+    fs.existsSync(mockPath) &&
+    relative(join(process.cwd(), dirname(config.output)), mockPath);
   let filepath = relative(rootdir, file).split('.').slice(0, -1).join('.');
   let path = '/api/' + filepath;
 

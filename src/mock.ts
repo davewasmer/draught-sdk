@@ -1,14 +1,18 @@
-import { MockMutation } from './mutate';
-import { MockQuery } from './query';
-
-const MOCKING_KEY = 'draught-sdk-mockin';
+const MOCKING_KEY = 'draught-sdk-mocking';
+const SCENARIOS_KEY = 'draught-sdk-mock-scenarios';
 
 export default function isMocking() {
   let devmodeEnabled = window.localStorage.getItem(MOCKING_KEY);
   return devmodeEnabled === 'true';
 }
 
-class MockContext<Schema extends Record<string, any>> {
+export type MockEndpoint<Schema extends Record<string, any>> = (
+  ctx: MockContext<Schema>,
+  url: string,
+  params: unknown
+) => void;
+
+export class MockContext<Schema extends Record<string, any>> {
   db = new Proxy({} as { [P in keyof Schema]: MockCollection<Schema[P]> }, {
     get(target, property) {
       if (typeof property !== 'string') {
@@ -22,8 +26,38 @@ class MockContext<Schema extends Record<string, any>> {
     },
   });
 
+  scenarios: string[] = [];
+
   constructor() {
-    // load scenarios & replay
+    this.scenarios = (window.localStorage.getItem(SCENARIOS_KEY) ?? '').split(
+      ','
+    );
+  }
+
+  async load(moduleCtx: __WebpackModuleApi.RequireContext) {
+    await Promise.all(
+      this.scenarios.map(async name => {
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        let scenario = (moduleCtx(name) as MockScenarioModule).default;
+        await scenario(this);
+      })
+    );
+  }
+
+  addScenario(name: string) {
+    this.scenarios.push(name);
+    this.saveScenarios();
+  }
+
+  removeScenario(index: number) {
+    this.scenarios.splice(index, 1);
+    this.saveScenarios();
+  }
+
+  private saveScenarios() {
+    if (window.localStorage) {
+      window.localStorage.setItem(SCENARIOS_KEY, this.scenarios.join(','));
+    }
   }
 }
 
@@ -37,10 +71,8 @@ const root = (typeof window === 'undefined' ? {} : window) as {
   mockCtx: MockContext<any>;
 };
 
-const mockCtx = (root.mockCtx = root.mockCtx ?? new MockContext());
+export const mockCtx = (root.mockCtx = root.mockCtx ?? new MockContext());
 
-export function wrapMock(mock: MockQuery | MockMutation) {
-  return (params: any) => {
-    mock(mockCtx, params);
-  };
-}
+export type MockScenarioModule = {
+  default(ctx: MockContext<any>): void | Promise<void>;
+};

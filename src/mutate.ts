@@ -1,22 +1,13 @@
 import { isEmpty } from 'lodash';
-import isMocking from './mock';
+import { MutationFunction } from 'react-query';
+import isMocking, { mockCtx, MockEndpoint } from './mock';
 import populateEndpoint from './populate-endpoint';
 
-// TODO update based on what mocking env looks like
-export type MockMutation = (
-  ctx: unknown,
-  params: unknown
-) => Promise<unknown> | unknown;
-
 /** Query the API at the given endpoint, using the supplied variables */
-export default function makeMutate<Input extends Record<string, any>>(
-  endpoint: string,
-  mock: MockMutation | null
-) {
-  if (mock && isMocking()) {
-    // TODO wrap in the mocking environment
-    return mock;
-  }
+export default function makeMutate<
+  Input extends Record<string, any>,
+  Schema extends Record<string, any>
+>(endpoint: string, mock: MockEndpoint<Schema> | null) {
   return async function mutate(params: Input) {
     let url = endpoint;
 
@@ -28,6 +19,11 @@ export default function makeMutate<Input extends Record<string, any>>(
       );
       url = populatedEndpoint;
       params = remainingParams as any;
+    }
+
+    if (mock && isMocking()) {
+      // TODO wrap in the mocking environment
+      return mock(mockCtx, url, params);
     }
 
     // POST to the endpoint with any params leftover from populating the URL
@@ -50,5 +46,5 @@ export default function makeMutate<Input extends Record<string, any>>(
       );
     }
     return result;
-  };
+  } as MutationFunction;
 }

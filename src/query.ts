@@ -1,20 +1,15 @@
 import { isEmpty } from 'lodash';
-import isMocking from './mock';
+import { QueryFunction } from 'react-query';
+import isMocking, { mockCtx, MockEndpoint } from './mock';
 import populateEndpoint from './populate-endpoint';
 
-// TODO update based on mocking env
-export type MockQuery = (ctx: unknown, params: unknown) => void;
-
 /** Query the API at the given endpoint, using the supplied variables */
-export default function makeQuery(mock: MockQuery | null) {
-  if (mock && isMocking()) {
-    // TODO wrap in mocking environment
-    return mock;
-  }
-  return async function query(
-    endpointUrl: string,
-    params?: Record<string, string | number>
-  ) {
+export default function makeQuery<Schema extends Record<string, any>>(
+  mock: MockEndpoint<Schema> | null
+): QueryFunction {
+  return async function query({ queryKey }) {
+    let endpointUrl = queryKey[0] as string;
+    let params = queryKey[1] as Record<string, string | number>;
     let url = endpointUrl;
 
     // Populate the url with the given params
@@ -39,6 +34,11 @@ export default function makeQuery(mock: MockQuery | null) {
       throw new Error(
         `React Query is trying to fetch data from ${url} during an SSR render pass. It should not be doing this - it should fetch data during getServerSideProps, not during render. You probably forgot to add the query hook to the prefetch list for this page.`
       );
+    }
+
+    // Handle mocked endpoints
+    if (mock && isMocking()) {
+      return mock(mockCtx, endpointUrl, params);
     }
 
     // Fetch the endpoint
