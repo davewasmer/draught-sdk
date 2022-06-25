@@ -1,6 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-describe('too hard to test for now', () => {
-  it('should test', () => {
+describe('generating sdk', () => {
+  it('should generate', () => {
+    process.chdir('test/fixtures');
+    require('../src/generate');
     return;
   });
 });
