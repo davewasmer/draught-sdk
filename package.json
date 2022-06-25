@@ -7,7 +7,7 @@
     "lib/**/*"
   ],
   "bin": {
-    "generate": "./bin/generate.js"
+    "generate": "./bin/draught-sdk.js"
   },
   "scripts": {
     "build": "tsc",
