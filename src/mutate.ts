@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 import { MutationFunction } from 'react-query';
-import isMocking, { mockCtx, MockEndpoint } from './mock';
+import { isMocking, mockCtx, MockEndpoint } from './mock';
 import populateEndpoint from './populate-endpoint';
 
 /** Query the API at the given endpoint, using the supplied variables */
@@ -22,7 +22,7 @@ export default function mutate<Input extends Record<string, any>>(
     }
 
     if (mock && isMocking()) {
-      return mock(mockCtx, url, params);
+      return mock(mockCtx, params, url);
     }
 
     // POST to the endpoint with any params leftover from populating the URL

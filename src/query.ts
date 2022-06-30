@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 import { QueryFunction } from 'react-query';
-import isMocking, { mockCtx, MockEndpoint } from './mock';
+import { isMocking, mockCtx, MockEndpoint } from './mock';
 import populateEndpoint from './populate-endpoint';
 
 /** Query the API at the given endpoint, using the supplied variables */
@@ -36,7 +36,7 @@ export default function query(mock: MockEndpoint<any> | null): QueryFunction {
 
     // Handle mocked endpoints
     if (mock && isMocking()) {
-      return mock(mockCtx, endpointUrl, params);
+      return mock(mockCtx, params, endpointUrl);
     }
 
     // Fetch the endpoint
